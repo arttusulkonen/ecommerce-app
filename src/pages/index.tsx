@@ -3,13 +3,15 @@ import Image from 'next/image';
 import Header from '@components/Header';
 import Footer from '@components/Footer';
 import Container from '@components/Container';
-import { Product } from 'lib/types';
+import { Cards } from 'lib/types';
 
-import products from '@data/products.json';
 import Button from '@components/Button';
 import Script from 'next/script';
 
-export default function Home() {
+import { GET_ALL_CARDS } from 'lib/queries';
+import { client } from 'lib/client';
+
+export default function Home({ cards }: Cards) {
   return (
     <>
       <Head>
@@ -30,24 +32,24 @@ export default function Home() {
           <h1>Hyper Bros. Trading Cards</h1>
           <h2>Available Cards</h2>
           <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12">
-            {products.map((product: Product) => {
+            {cards.map((product) => {
               return (
-                <li className="p-3" key={product.id}>
+                <li className="p-3" key={product.productId}>
                   <Image
-                    src={product.image}
+                    src={product.featuredImage.sourceUrl}
                     alt={product.title}
-                    width={864}
-                    height={1200}
+                    width={product.featuredImage.mediaDetails.width}
+                    height={product.featuredImage.mediaDetails.height}
                   />
                   <h3 className="text-xl font-bold mt-1.5">{product.title}</h3>
-                  <p className="mt-1.5">${product.price}</p>
+                  <p className="mt-1.5">${product.productPrice}</p>
                   <p>
                     <Button
-                      data-item-id={product.id}
-                      data-item-price={product.price}
+                      data-item-id={product.productId}
+                      data-item-price={product.productPrice}
                       data-item-url="/"
                       data-item-description=""
-                      data-item-image={product.image}
+                      data-item-image={product.featuredImage.sourceUrl}
                       data-item-name={product.title}
                       data-item-custom1-name="Gift"
                       data-item-custom1-type="checkbox"
@@ -73,4 +75,29 @@ export default function Home() {
       />
     </>
   );
+}
+
+export async function getStaticProps() {
+  const response = await client.query({
+    query: GET_ALL_CARDS,
+  });
+
+  const cards = response.data.products.edges.map(({ node }) => {
+    const data = {
+      ...node,
+      ...node.product,
+      featuredImage: {
+        ...node.featuredImage.node,
+      },
+    };
+    console.log(data);
+
+    return data;
+  });
+
+  return {
+    props: {
+      cards,
+    },
+  };
 }

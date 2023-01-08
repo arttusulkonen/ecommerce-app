@@ -28,3 +28,26 @@ export const GET_ALL_CARDS = gql`
     }
   }
 `;
+export const GET_SINGLE_CARD = gql`
+  query GetSingleCard($slug: ID!) {
+    product(id: $slug, idType: SLUG) {
+      title
+      content
+      product {
+        productId
+        productPrice
+      }
+      slug
+      featuredImage {
+        node {
+          altText
+          sourceUrl
+          mediaDetails {
+            height
+            width
+          }
+        }
+      }
+    }
+  }
+`;

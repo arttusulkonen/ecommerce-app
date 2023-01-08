@@ -10,6 +10,7 @@ import Script from 'next/script';
 
 import { GET_ALL_CARDS } from 'lib/queries';
 import { client } from 'lib/client';
+import Link from 'next/link';
 
 export default function Home({ cards }: Cards) {
   return (
@@ -35,14 +36,20 @@ export default function Home({ cards }: Cards) {
             {cards.map((product) => {
               return (
                 <li className="p-3" key={product.productId}>
-                  <Image
-                    src={product.featuredImage.sourceUrl}
-                    alt={product.title}
-                    width={product.featuredImage.mediaDetails.width}
-                    height={product.featuredImage.mediaDetails.height}
-                  />
-                  <h3 className="text-xl font-bold mt-1.5">{product.title}</h3>
-                  <p className="mt-1.5">${product.productPrice}</p>
+                  {/* <Link href={`/products/${product.slug}`}> */}
+                  <a href={`/products/${product.slug}`}>
+                    <Image
+                      src={product.featuredImage.sourceUrl}
+                      alt={product.title}
+                      width={product.featuredImage.mediaDetails.width}
+                      height={product.featuredImage.mediaDetails.height}
+                    />
+                    <h3 className="text-xl font-bold mt-1.5">
+                      {product.title}
+                    </h3>
+                    <p className="mt-1.5">${product.productPrice}</p>
+                  </a>
+                  {/* </Link> */}
                   <p>
                     <Button
                       data-item-id={product.productId}
@@ -90,7 +97,6 @@ export async function getStaticProps() {
         ...node.featuredImage.node,
       },
     };
-    console.log(data);
 
     return data;
   });
